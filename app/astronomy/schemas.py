@@ -1,10 +1,11 @@
 from datetime import datetime, date
+from typing import Optional
 
 from pydantic import BaseModel
 
 
 class EventBase(BaseModel):
-    day: date
+    day: datetime
     event: str
 
     class Config:
@@ -13,6 +14,7 @@ class EventBase(BaseModel):
 
 class EventGet(EventBase):
     id: int
+    cloud: Optional[int] = None
 
 
 class EventCreate(EventBase):

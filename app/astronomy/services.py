@@ -1,5 +1,8 @@
+import json
+import re
 from typing import Optional, List
 
+import requests
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.exc import IntegrityError
@@ -9,12 +12,36 @@ from app.astronomy.models import AstronomicalEvents
 from app.astronomy.schemas import EventCreate, EventUpdate
 
 
-def get(db: Session, id: int) -> Optional[AstronomicalEvents]:
-    return db.query(AstronomicalEvents).filter(AstronomicalEvents == id).first()
+def get_weather_in_city(city: str, day: int):
+    r = requests.get(
+        f'http://api.weatherapi.com/v1/forecast.json?key=bf244d3c98364dcdae8193835200912&q={city}&days={day}')
+    data = json.loads(r.content)
+    lst_hour = []
+    for el in data["forecast"]["forecastday"]:
+        lst_hour.append(el["hour"])
+    return lst_hour
 
 
-def get_multi(db: Session, *, skip: int = 0, limit: int = 100) -> List[AstronomicalEvents]:
-    return db.query(AstronomicalEvents).offset(skip).limit(limit).all()
+def add_field_cloud_percent(*, city: str, hour: str, day: int = 1, event_obj: List[AstronomicalEvents]):
+    data = get_weather_in_city(city=city, day=day)
+    for obj in event_obj:
+        event_day = re.split(" ", str(obj.day))[0]
+        for day in data:
+            for el in day:
+                if re.split(" ", el["time"])[0] == event_day:
+                    if re.split(" ", el["time"])[-1] == hour:
+                        setattr(obj, "cloud", el["cloud"])
+    return event_obj
+
+
+def get(db: Session, id: int) -> AstronomicalEvents:
+    event = db.query(AstronomicalEvents).filter(AstronomicalEvents.id == id).first()
+    return event
+
+
+def filter_by_date(db: Session, *, day_from: str, day_to: str) -> List[AstronomicalEvents]:
+    return db.query(AstronomicalEvents).filter(
+        AstronomicalEvents.day.between(day_from, day_to)).all()
 
 
 def create(db: Session, *, schema: EventCreate) -> AstronomicalEvents:
