@@ -5,5 +5,7 @@ alembic
 python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
-
-
+fastapi-mail
+psycopg2-binary
+requests
+itsdangerous
