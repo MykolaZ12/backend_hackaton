@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.post("/email")
-async def send_in_background(
+async def send_email(
         background_tasks: BackgroundTasks,
         email: schemas.EmailSchema,
         db: Session = Depends(get_db)
@@ -25,8 +25,8 @@ async def send_in_background(
     )
 
     fm = FastMail(conf)
-    if not services.get_by_email(db=db, email=email.email):
-        services.create(db=db, schema=schemas.ContactCreate(email=email.email))
+    if not services.get_contact_by_email(db=db, email=email.email):
+        services.create_contact(db=db, schema=schemas.ContactCreate(email=email.email))
     background_tasks.add_task(fm.send_message, message)
 
     return JSONResponse(status_code=200, content={"message": "email has been sent"})

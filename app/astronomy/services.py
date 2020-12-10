@@ -10,17 +10,29 @@ from app.astronomy.models import AstronomicalEvents
 from app.astronomy.schemas import EventCreate, EventUpdate
 
 
-def get_weather_in_city(city: str, day: int):
+def get_weather_in_city(city: str, day: int) -> List[list]:
+    """Returns a list of weather by hours of each day"""
     r = requests.get(
         f'http://api.weatherapi.com/v1/forecast.json?key=bf244d3c98364dcdae8193835200912&q={city}&days={day}')
     data = json.loads(r.content)
     lst_hour = []
     for el in data["forecast"]["forecastday"]:
         lst_hour.append(el["hour"])
+    print(len(lst_hour))
     return lst_hour
 
 
-def add_field_cloud_percent(*, city: str, hour: str, day: int = 1, event_obj: List[AstronomicalEvents]):
+def add_field_cloud_percent(
+        *,
+        city: str,
+        hour: str,
+        day: int = 10,
+        event_obj: List[AstronomicalEvents]
+) -> List[AstronomicalEvents]:
+    """
+    Creates an additional cloud  field for each object in the list[AstronomicalEvents]
+    If information is available cloud = percentage of clouds
+    """
     data = get_weather_in_city(city=city, day=day)
     for obj in event_obj:
         event_day = re.split(" ", str(obj.day))[0]
@@ -32,17 +44,17 @@ def add_field_cloud_percent(*, city: str, hour: str, day: int = 1, event_obj: Li
     return event_obj
 
 
-def get(db: Session, id: int) -> AstronomicalEvents:
+def get_event(db: Session, id: int) -> AstronomicalEvents:
     event = db.query(AstronomicalEvents).filter(AstronomicalEvents.id == id).first()
     return event
 
 
-def filter_by_date(db: Session, *, day_from: str, day_to: str) -> List[AstronomicalEvents]:
+def filter_event_by_date(db: Session, *, day_from: str, day_to: str) -> List[AstronomicalEvents]:
     return db.query(AstronomicalEvents).filter(
         AstronomicalEvents.day.between(day_from, day_to)).all()
 
 
-def create(db: Session, *, schema: EventCreate) -> AstronomicalEvents:
+def create_event(db: Session, *, schema: EventCreate) -> AstronomicalEvents:
     obj_in_data = jsonable_encoder(schema)
     db_obj = AstronomicalEvents(**obj_in_data)
     db.add(db_obj)
