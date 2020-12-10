@@ -18,6 +18,7 @@ class EventGet(EventBase):
     id: int
     cloud: Optional[int] = None
     duration: str
+    img: Optional[str] = None
 
 
 class EventCreate(EventBase):
