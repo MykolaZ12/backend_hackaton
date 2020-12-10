@@ -7,4 +7,5 @@ class AstronomicalEvents(Base):
     __tablename__ = "event"
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True)
     day = Column(DateTime)
-    event = Column(String)
+    event_ua = Column(String)
+    event_en = Column(String)
