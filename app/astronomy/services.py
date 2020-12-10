@@ -13,7 +13,7 @@ from app.astronomy.schemas import EventCreate, EventUpdate
 def get_weather_in_city(city: str) -> List[list]:
     """Returns a list of weather by hours of each day"""
     r = requests.get(
-        f'https://api.weatherbit.io/v2.0/forecast/daily?city={city}&country=UA&days=16&key=00c46be0a5b647c3953b20f4d4adcda7')
+        f'https://api.weatherbit.io/v2.0/forecast/daily?city={city}&country=UA&days=16&key=59bccc40c9a94e20bc18549c20f5cb8f')
     data = json.loads(r.content)
     return data["data"]
 
