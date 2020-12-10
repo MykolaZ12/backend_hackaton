@@ -3,9 +3,7 @@ import re
 from typing import Optional, List
 
 import requests
-from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.astronomy.models import AstronomicalEvents
@@ -46,13 +44,10 @@ def filter_by_date(db: Session, *, day_from: str, day_to: str) -> List[Astronomi
 
 def create(db: Session, *, schema: EventCreate) -> AstronomicalEvents:
     obj_in_data = jsonable_encoder(schema)
-    db_obj = AstronomicalEvents(**obj_in_data)  # type: ignore
-    try:
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="IntegrityError")
+    db_obj = AstronomicalEvents(**obj_in_data)
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
     return db_obj
 
 
@@ -65,12 +60,9 @@ def update(*, db: Session, db_obj: AstronomicalEvents, schema: EventUpdate) -> A
     for field in obj_data:
         if field in update_data:
             setattr(db_obj, field, update_data[field])
-    try:
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="IntegrityError")
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
     return db_obj
 
 
