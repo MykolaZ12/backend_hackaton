@@ -10,37 +10,30 @@ from app.astronomy.models import AstronomicalEvents
 from app.astronomy.schemas import EventCreate, EventUpdate
 
 
-def get_weather_in_city(city: str, day: int) -> List[list]:
+def get_weather_in_city(city: str) -> List[list]:
     """Returns a list of weather by hours of each day"""
     r = requests.get(
-        f'http://api.weatherapi.com/v1/forecast.json?key=bf244d3c98364dcdae8193835200912&q={city}&days={day}')
+        f'https://api.weatherbit.io/v2.0/forecast/daily?city={city}&country=UA&days=16&key=00c46be0a5b647c3953b20f4d4adcda7')
     data = json.loads(r.content)
-    lst_hour = []
-    for el in data["forecast"]["forecastday"]:
-        lst_hour.append(el["hour"])
-    print(len(lst_hour))
-    return lst_hour
+    return data["data"]
 
 
 def add_field_cloud_percent(
         *,
         city: str,
-        hour: str,
-        day: int = 10,
         event_obj: List[AstronomicalEvents]
 ) -> List[AstronomicalEvents]:
     """
     Creates an additional cloud  field for each object in the list[AstronomicalEvents]
     If information is available cloud = percentage of clouds
     """
-    data = get_weather_in_city(city=city, day=day)
+    data = get_weather_in_city(city=city)
     for obj in event_obj:
-        event_day = re.split(" ", str(obj.day))[0]
+        event_day = re.split(" ", str(obj.date_start))[0]
+        setattr(obj, "duration", str(obj.date_end - obj.date_start))
         for day in data:
-            for el in day:
-                if re.split(" ", el["time"])[0] == event_day:
-                    if re.split(" ", el["time"])[-1] == hour:
-                        setattr(obj, "cloud", el["cloud"])
+            if day["valid_date"] == event_day:
+                setattr(obj, "cloud", day["clouds"])
     return event_obj
 
 
@@ -51,7 +44,7 @@ def get_event(db: Session, id: int) -> AstronomicalEvents:
 
 def filter_event_by_date(db: Session, *, day_from: str, day_to: str) -> List[AstronomicalEvents]:
     return db.query(AstronomicalEvents).filter(
-        AstronomicalEvents.day.between(day_from, day_to)).all()
+        AstronomicalEvents.date_start.between(day_from, day_to)).all()
 
 
 def create_event(db: Session, *, schema: EventCreate) -> AstronomicalEvents:

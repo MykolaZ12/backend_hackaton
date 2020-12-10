@@ -5,7 +5,8 @@ from pydantic import BaseModel
 
 
 class EventBase(BaseModel):
-    day: date
+    date_start: datetime
+    date_end: datetime
     event_ua: str
     event_en: str
 
@@ -15,8 +16,8 @@ class EventBase(BaseModel):
 
 class EventGet(EventBase):
     id: int
-    day: datetime
     cloud: Optional[int] = None
+    duration: str
 
 
 class EventCreate(EventBase):

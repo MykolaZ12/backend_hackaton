@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
+app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
 app.include_router(event.router, prefix=settings.API_V1_STR, tags=["Astronomical Events"])
 app.include_router(contact.router,  prefix=settings.API_V1_STR,  tags=["Send Email"])

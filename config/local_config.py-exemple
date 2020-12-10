@@ -1,5 +1,7 @@
 SECRET_KEY = "SECRET_KEY"
 
+SQLALCHEMY_DATABASE_URL = "postgresql://name:password@host/db_name"
+
 MAIL_USERNAME = "YourUsername",
 MAIL_PASSWORD = "strong_password",
 MAIL_FROM = "your@email.com",

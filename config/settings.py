@@ -7,13 +7,14 @@ VERSIONS = 1.0
 
 API_V1_STR = "/api/v1"
 
-SQLALCHEMY_DATABASE_URL = "postgresql://admin:password1234@tymkiv.pp.ua:5432/postgres"
+SQLALCHEMY_DATABASE_URL = local_config.SQLALCHEMY_DATABASE_URL
 
 SECRET_KEY = local_config.SECRET_KEY
 
 BACKEND_CORS_ORIGINS = [
     "http://localhost",
     "http://localhost:8080",
+    "http://localhost:3000",
 ]
 
 conf = ConnectionConfig(

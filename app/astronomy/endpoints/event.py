@@ -10,27 +10,25 @@ router = APIRouter()
 
 
 @router.get("/event/{id}", response_model=schemas.EventGet)
-def get_event(id: int, city: str, hour: str = "01:00", db: Session = Depends(get_db)):
+def get_event(id: int, city: str, db: Session = Depends(get_db)):
     """Get one astronomical event"""
     event = services.get_event(db=db, id=id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    event = services.add_field_cloud_percent(city=city, hour=hour, event_obj=[event])
+    event = services.add_field_cloud_percent(city=city, event_obj=[event])
+    setattr(event[0], "duration", str(event[0].date_end - event[0].date_start))
     return event[0]
 
 
 @router.get("/event/", response_model=List[schemas.EventGet])
 def filter_events(*, day_from: str = "2020-12-01", day_to: str = "2020-12-31", city: str,
-                  hour: str = "01:00",
-                  day: int = 10,
                   db: Session = Depends(get_db)):
     """Filter astronomical event, return list events"""
     events = services.filter_event_by_date(db=db, day_from=day_from, day_to=day_to)
     if not events:
         raise HTTPException(status_code=404, detail="Events not found")
-
-    events = services.add_field_cloud_percent(city=city, hour=hour, day=day, event_obj=events)
+    events = services.add_field_cloud_percent(city=city, event_obj=events)
     return events
 
 
