@@ -38,13 +38,15 @@ def add_field_cloud_percent(
 
 
 def get_event(db: Session, id: int) -> AstronomicalEvents:
-    event = db.query(AstronomicalEvents).filter(AstronomicalEvents.id == id).first()
+    event = db.query(AstronomicalEvents).filter(AstronomicalEvents.id == id).filter(
+        AstronomicalEvents.active.is_(True)).first()
     return event
 
 
 def filter_event_by_date(db: Session, *, day_from: str, day_to: str) -> List[AstronomicalEvents]:
     return db.query(AstronomicalEvents).filter(
-        AstronomicalEvents.date_start.between(day_from, day_to)).all()
+        AstronomicalEvents.date_start.between(day_from, day_to)).filter(
+        AstronomicalEvents.active.is_(True)).all()
 
 
 def create_event(db: Session, *, schema: EventCreate) -> AstronomicalEvents:

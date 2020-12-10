@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, String
+from sqlalchemy import Column, Integer, DateTime, String, Boolean
 
 from db.db import Base
 
@@ -10,3 +10,5 @@ class AstronomicalEvents(Base):
     date_end = Column(DateTime)
     event_ua = Column(String)
     event_en = Column(String)
+    img = Column(String(50))
+    active = Column(Boolean, default=True)
