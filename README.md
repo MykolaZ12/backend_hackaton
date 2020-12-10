@@ -18,7 +18,7 @@ ____
 alembic revision --autogenerate
 ```
 ____
-### 5 Create migrations
+### 5 Apply migrations
 ```bash
 alembic upgrade head
 ```
