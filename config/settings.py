@@ -15,6 +15,7 @@ BACKEND_CORS_ORIGINS = [
     "http://localhost",
     "http://localhost:8080",
     "http://localhost:3000",
+    "http://tymkiv.pp.ua:3000",
 ]
 
 conf = ConnectionConfig(
